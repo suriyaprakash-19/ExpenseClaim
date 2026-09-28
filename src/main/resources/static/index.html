@@ -1,0 +1,3998 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+  <title>ExpenseFlow | Expense Management</title>
+
+  <style>
+    /* =========================================================
+       GLOBAL
+    ========================================================= */
+
+    * {
+        box-sizing: border-box;
+        margin: 0;
+        padding: 0;
+        font-family: "Inter", "Segoe UI", Arial, sans-serif;
+    }
+
+    :root {
+        --primary: #4f46e5;
+        --primary-dark: #3730a3;
+        --secondary: #06b6d4;
+
+        --dark: #111827;
+        --dark-2: #1f2937;
+
+        --text: #172033;
+        --muted: #64748b;
+
+        --bg: #f5f7fb;
+        --white: #ffffff;
+
+        --border: #e5e7eb;
+
+        --green: #16a34a;
+        --green-bg: #dcfce7;
+
+        --yellow: #d97706;
+        --yellow-bg: #fef3c7;
+
+        --red: #dc2626;
+        --red-bg: #fee2e2;
+
+        --shadow:
+            0 10px 30px rgba(15, 23, 42, 0.07);
+
+        --shadow-hover:
+            0 15px 35px rgba(15, 23, 42, 0.12);
+    }
+
+    body {
+        background:
+            radial-gradient(
+                circle at 80% 0%,
+                rgba(79,70,229,0.07),
+                transparent 30%
+            ),
+            var(--bg);
+
+        color: var(--text);
+        min-height: 100vh;
+    }
+
+    button,
+    input,
+    select,
+    textarea {
+        font-family: inherit;
+    }
+
+
+    /* =========================================================
+       SIDEBAR
+    ========================================================= */
+
+    .sidebar {
+        position: fixed;
+        left: 0;
+        top: 0;
+
+        width: 250px;
+        height: 100vh;
+
+        background:
+            linear-gradient(
+                180deg,
+                #111827 0%,
+                #172033 55%,
+                #111827 100%
+            );
+
+        color: white;
+
+        padding: 26px 16px;
+
+        z-index: 50;
+
+        box-shadow:
+            8px 0 30px rgba(15,23,42,0.08);
+    }
+
+    .brand {
+        display: flex;
+        align-items: center;
+        gap: 12px;
+
+        padding: 0 10px 32px;
+    }
+
+    .brand-icon {
+        width: 43px;
+        height: 43px;
+
+        border-radius: 13px;
+
+        display: flex;
+        align-items: center;
+        justify-content: center;
+
+        font-size: 20px;
+
+        background:
+            linear-gradient(
+                135deg,
+                #6366f1,
+                #06b6d4
+            );
+
+        box-shadow:
+            0 8px 20px rgba(79,70,229,0.35);
+    }
+
+    .brand-name {
+        font-size: 20px;
+        font-weight: 800;
+        letter-spacing: -0.5px;
+    }
+
+    .brand-name span {
+        color: #67e8f9;
+    }
+
+    .brand-sub {
+        font-size: 10px;
+        color: #94a3b8;
+        margin-top: 2px;
+    }
+
+    .menu-label {
+        font-size: 10px;
+        text-transform: uppercase;
+        letter-spacing: 1.5px;
+        color: #64748b;
+
+        padding: 0 13px;
+        margin: 5px 0 10px;
+    }
+
+    .nav-btn {
+        width: 100%;
+
+        border: none;
+        background: transparent;
+
+        color: #94a3b8;
+
+        display: flex;
+        align-items: center;
+
+        gap: 13px;
+
+        padding: 13px 14px;
+
+        border-radius: 11px;
+
+        cursor: pointer;
+
+        margin-bottom: 5px;
+
+        font-size: 13px;
+        font-weight: 600;
+
+        text-align: left;
+
+        transition:
+            background 0.2s,
+            color 0.2s,
+            transform 0.2s;
+    }
+
+    .nav-icon {
+        width: 28px;
+        height: 28px;
+
+        border-radius: 8px;
+
+        display: flex;
+        align-items: center;
+        justify-content: center;
+
+        background: rgba(255,255,255,0.04);
+
+        font-size: 15px;
+    }
+
+    .nav-btn:hover {
+        background: rgba(255,255,255,0.07);
+        color: white;
+        transform: translateX(2px);
+    }
+
+    .nav-btn.active {
+        color: white;
+
+        background:
+            linear-gradient(
+                90deg,
+                rgba(79,70,229,0.9),
+                rgba(79,70,229,0.55)
+            );
+
+        box-shadow:
+            0 8px 20px rgba(79,70,229,0.18);
+    }
+
+    .nav-btn.active .nav-icon {
+        background: rgba(255,255,255,0.15);
+    }
+
+    .sidebar-bottom {
+        position: absolute;
+
+        left: 16px;
+        right: 16px;
+        bottom: 22px;
+
+        padding: 15px;
+
+        border-radius: 13px;
+
+        background: rgba(255,255,255,0.05);
+
+        border: 1px solid rgba(255,255,255,0.06);
+    }
+
+    .sidebar-bottom-title {
+        font-size: 11px;
+        color: #94a3b8;
+        margin-bottom: 5px;
+    }
+
+    .sidebar-bottom-text {
+        font-size: 12px;
+        color: #e2e8f0;
+    }
+
+
+    /* =========================================================
+       MAIN
+    ========================================================= */
+
+    .main {
+        margin-left: 250px;
+
+        padding: 28px 34px;
+
+        min-height: 100vh;
+    }
+
+
+    /* =========================================================
+       TOP BAR
+    ========================================================= */
+
+    .topbar {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+
+        margin-bottom: 30px;
+    }
+
+    .page-heading h1 {
+        font-size: 28px;
+
+        letter-spacing: -0.8px;
+
+        font-weight: 750;
+    }
+
+    .page-heading p {
+        color: var(--muted);
+
+        font-size: 13px;
+
+        margin-top: 6px;
+    }
+
+    .top-actions {
+        display: flex;
+        align-items: center;
+        gap: 12px;
+    }
+
+    .notification {
+        width: 40px;
+        height: 40px;
+
+        border-radius: 11px;
+
+        background: white;
+
+        border: 1px solid var(--border);
+
+        cursor: pointer;
+
+        position: relative;
+
+        font-size: 17px;
+    }
+
+    .notification::after {
+        content: "";
+
+        position: absolute;
+
+        width: 7px;
+        height: 7px;
+
+        background: #ef4444;
+
+        border-radius: 50%;
+
+        top: 8px;
+        right: 8px;
+
+        border: 2px solid white;
+    }
+
+    .profile {
+        display: flex;
+        align-items: center;
+        gap: 10px;
+
+        background: white;
+
+        padding: 6px 11px 6px 6px;
+
+        border-radius: 13px;
+
+        border: 1px solid var(--border);
+
+        box-shadow: 0 4px 12px rgba(15,23,42,0.04);
+    }
+
+    .profile-avatar {
+        width: 32px;
+        height: 32px;
+
+        border-radius: 10px;
+
+        background:
+            linear-gradient(
+                135deg,
+                #6366f1,
+                #06b6d4
+            );
+
+        color: white;
+
+        display: flex;
+        align-items: center;
+        justify-content: center;
+
+        font-weight: 700;
+        font-size: 12px;
+    }
+
+    .profile-name {
+        font-size: 12px;
+        font-weight: 700;
+    }
+
+    .profile-role {
+        font-size: 10px;
+        color: var(--muted);
+    }
+
+
+    /* =========================================================
+       SECTIONS
+    ========================================================= */
+
+    .section {
+        display: none;
+
+        animation: fadeIn 0.25s ease;
+    }
+
+    .section.active {
+        display: block;
+    }
+
+    @keyframes fadeIn {
+        from {
+            opacity: 0;
+            transform: translateY(5px);
+        }
+
+        to {
+            opacity: 1;
+            transform: translateY(0);
+        }
+    }
+
+
+    /* =========================================================
+       DASHBOARD CARDS
+    ========================================================= */
+
+    .stats-grid {
+        display: grid;
+
+        grid-template-columns:
+            repeat(4, 1fr);
+
+        gap: 18px;
+
+        margin-bottom: 25px;
+    }
+
+    .stat-card {
+        background: white;
+
+        border-radius: 17px;
+
+        padding: 21px;
+
+        border: 1px solid rgba(226,232,240,0.8);
+
+        box-shadow: var(--shadow);
+
+        position: relative;
+
+        overflow: hidden;
+
+        transition:
+            transform 0.25s,
+            box-shadow 0.25s;
+    }
+
+    .stat-card:hover {
+        transform: translateY(-4px);
+        box-shadow: var(--shadow-hover);
+    }
+
+    .stat-card::after {
+        content: "";
+
+        position: absolute;
+
+        width: 100px;
+        height: 100px;
+
+        right: -40px;
+        top: -40px;
+
+        border-radius: 50%;
+
+        background: rgba(79,70,229,0.06);
+    }
+
+    .stat-top {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+    }
+
+    .stat-icon {
+        width: 40px;
+        height: 40px;
+
+        border-radius: 12px;
+
+        display: flex;
+        align-items: center;
+        justify-content: center;
+
+        font-size: 18px;
+
+        background: #eef2ff;
+    }
+
+    .stat-label {
+        font-size: 12px;
+        color: var(--muted);
+        font-weight: 600;
+    }
+
+    .stat-number {
+        font-size: 30px;
+
+        font-weight: 800;
+
+        margin-top: 15px;
+
+        letter-spacing: -1px;
+    }
+
+    .stat-description {
+        color: #94a3b8;
+
+        font-size: 10px;
+
+        margin-top: 4px;
+    }
+
+
+    /* =========================================================
+       DASHBOARD CONTENT
+    ========================================================= */
+
+    .dashboard-grid {
+        display: grid;
+
+        grid-template-columns:
+            1.5fr 1fr;
+
+        gap: 20px;
+    }
+
+    .dashboard-card {
+        background: white;
+
+        border-radius: 17px;
+
+        padding: 23px;
+
+        border: 1px solid rgba(226,232,240,0.8);
+
+        box-shadow: var(--shadow);
+    }
+
+    .dashboard-card-header {
+        display: flex;
+
+        justify-content: space-between;
+
+        align-items: center;
+
+        margin-bottom: 20px;
+    }
+
+    .dashboard-card-header h2 {
+        font-size: 16px;
+    }
+
+    .dashboard-card-header span {
+        color: var(--muted);
+        font-size: 11px;
+    }
+
+    .workflow {
+        display: flex;
+
+        align-items: center;
+
+        justify-content: space-between;
+
+        padding: 15px 5px;
+    }
+
+    .workflow-step {
+        text-align: center;
+        position: relative;
+        flex: 1;
+    }
+
+    .workflow-icon {
+        width: 45px;
+        height: 45px;
+
+        margin: auto;
+
+        border-radius: 14px;
+
+        display: flex;
+        align-items: center;
+        justify-content: center;
+
+        background: #eef2ff;
+
+        font-size: 18px;
+
+        position: relative;
+
+        z-index: 2;
+    }
+
+    .workflow-step:not(:last-child)::after {
+        content: "";
+
+        position: absolute;
+
+        top: 22px;
+
+        left: 62%;
+
+        width: 76%;
+
+        height: 2px;
+
+        background: #e2e8f0;
+    }
+
+    .workflow-title {
+        font-size: 10px;
+
+        font-weight: 700;
+
+        margin-top: 8px;
+    }
+
+    .workflow-desc {
+        font-size: 9px;
+
+        color: #94a3b8;
+
+        margin-top: 3px;
+    }
+
+    .info-box {
+        background:
+            linear-gradient(
+                135deg,
+                #eef2ff,
+                #ecfeff
+            );
+
+        border-radius: 14px;
+
+        padding: 18px;
+
+        border: 1px solid #e0e7ff;
+    }
+
+    .info-box-title {
+        font-weight: 700;
+        font-size: 13px;
+        margin-bottom: 7px;
+    }
+
+    .info-box-text {
+        font-size: 11px;
+        line-height: 1.7;
+        color: #64748b;
+    }
+
+
+    /* =========================================================
+       TABLE PANEL
+    ========================================================= */
+
+    .panel {
+        background: white;
+
+        border-radius: 18px;
+
+        padding: 24px;
+
+        border: 1px solid rgba(226,232,240,0.8);
+
+        box-shadow: var(--shadow);
+    }
+
+    .panel-header {
+        display: flex;
+
+        justify-content: space-between;
+
+        align-items: center;
+
+        gap: 15px;
+
+        margin-bottom: 20px;
+    }
+
+    .panel-title {
+        display: flex;
+        align-items: center;
+        gap: 11px;
+    }
+
+    .panel-title-icon {
+        width: 38px;
+        height: 38px;
+
+        border-radius: 11px;
+
+        background: #eef2ff;
+
+        display: flex;
+        align-items: center;
+        justify-content: center;
+
+        font-size: 17px;
+    }
+
+    .panel-title h2 {
+        font-size: 17px;
+    }
+
+    .panel-title p {
+        font-size: 10px;
+        color: var(--muted);
+        margin-top: 2px;
+    }
+
+
+    /* =========================================================
+       BUTTONS
+    ========================================================= */
+
+    .btn {
+        border: none;
+
+        border-radius: 10px;
+
+        padding: 10px 15px;
+
+        cursor: pointer;
+
+        font-weight: 700;
+
+        font-size: 12px;
+
+        transition:
+            transform 0.2s,
+            box-shadow 0.2s,
+            background 0.2s;
+    }
+
+    .btn:hover {
+        transform: translateY(-1px);
+    }
+
+    .btn-primary {
+        color: white;
+
+        background:
+            linear-gradient(
+                135deg,
+                #4f46e5,
+                #6366f1
+            );
+
+        box-shadow:
+            0 7px 15px rgba(79,70,229,0.2);
+    }
+
+    .btn-primary:hover {
+        box-shadow:
+            0 10px 20px rgba(79,70,229,0.28);
+    }
+
+    .btn-edit {
+        background: #eef2ff;
+        color: #4f46e5;
+    }
+
+    .btn-danger {
+        background: #fff1f2;
+        color: #e11d48;
+    }
+
+    .btn-cancel {
+        background: #f1f5f9;
+        color: #475569;
+    }
+
+
+    /* =========================================================
+       SEARCH BAR
+    ========================================================= */
+
+    .toolbar {
+        display: flex;
+
+        justify-content: space-between;
+
+        align-items: center;
+
+        gap: 15px;
+
+        margin-bottom: 18px;
+    }
+
+    .search-wrapper {
+        position: relative;
+
+        width: 310px;
+    }
+
+    .search-icon {
+        position: absolute;
+
+        left: 13px;
+        top: 50%;
+
+        transform: translateY(-50%);
+
+        color: #94a3b8;
+    }
+
+    .search {
+        width: 100%;
+
+        padding: 11px 13px 11px 38px;
+
+        border: 1px solid var(--border);
+
+        border-radius: 10px;
+
+        background: #f8fafc;
+
+        outline: none;
+
+        font-size: 12px;
+
+        transition: 0.2s;
+    }
+
+    .search:focus {
+        background: white;
+
+        border-color: #818cf8;
+
+        box-shadow:
+            0 0 0 3px rgba(99,102,241,0.08);
+    }
+
+
+    /* =========================================================
+       TABLE
+    ========================================================= */
+
+    .table-wrapper {
+        overflow-x: auto;
+
+        border: 1px solid #edf0f4;
+
+        border-radius: 13px;
+    }
+
+    table {
+        width: 100%;
+
+        border-collapse: collapse;
+
+        min-width: 750px;
+    }
+
+    thead {
+        background: #f8fafc;
+    }
+
+    th {
+        text-align: left;
+
+        padding: 13px 15px;
+
+        color: #64748b;
+
+        font-size: 10px;
+
+        font-weight: 800;
+
+        text-transform: uppercase;
+
+        letter-spacing: 0.5px;
+
+        border-bottom: 1px solid #e5e7eb;
+    }
+
+    td {
+        padding: 14px 15px;
+
+        border-bottom: 1px solid #f1f5f9;
+
+        font-size: 12px;
+
+        color: #475569;
+    }
+
+    tbody tr {
+        transition: background 0.15s;
+    }
+
+    tbody tr:hover {
+        background: #fafbff;
+    }
+
+    tbody tr:last-child td {
+        border-bottom: none;
+    }
+
+    td strong {
+        color: #1e293b;
+    }
+
+
+    /* =========================================================
+       STATUS
+    ========================================================= */
+
+    .badge {
+        display: inline-flex;
+
+        align-items: center;
+
+        gap: 5px;
+
+        padding: 5px 9px;
+
+        border-radius: 20px;
+
+        font-size: 9px;
+
+        font-weight: 800;
+
+        text-transform: uppercase;
+    }
+
+    .badge::before {
+        content: "";
+
+        width: 5px;
+        height: 5px;
+
+        border-radius: 50%;
+    }
+
+    .approved {
+        color: #15803d;
+        background: #dcfce7;
+    }
+
+    .approved::before {
+        background: #16a34a;
+    }
+
+    .pending {
+        color: #b45309;
+        background: #fef3c7;
+    }
+
+    .pending::before {
+        background: #f59e0b;
+    }
+
+    .rejected {
+        color: #b91c1c;
+        background: #fee2e2;
+    }
+
+    .rejected::before {
+        background: #ef4444;
+    }
+
+
+    /* =========================================================
+       ACTION BUTTONS
+    ========================================================= */
+
+    .action-group {
+        display: flex;
+
+        gap: 6px;
+    }
+
+    .action-btn {
+        border: none;
+
+        width: 31px;
+        height: 31px;
+
+        border-radius: 8px;
+
+        cursor: pointer;
+
+        display: flex;
+        align-items: center;
+        justify-content: center;
+
+        transition: 0.2s;
+    }
+
+    .action-btn:hover {
+        transform: translateY(-2px);
+    }
+
+
+    /* =========================================================
+       MODAL
+    ========================================================= */
+
+    .modal {
+        position: fixed;
+
+        inset: 0;
+
+        background:
+            rgba(15,23,42,0.55);
+
+        backdrop-filter: blur(5px);
+
+        display: none;
+
+        align-items: center;
+
+        justify-content: center;
+
+        z-index: 100;
+    }
+
+    .modal.show {
+        display: flex;
+
+        animation: modalFade 0.2s ease;
+    }
+
+    @keyframes modalFade {
+        from {
+            opacity: 0;
+        }
+
+        to {
+            opacity: 1;
+        }
+    }
+
+    .modal-box {
+        width: 650px;
+
+        max-width: 94%;
+
+        max-height: 90vh;
+
+        overflow-y: auto;
+
+        background: white;
+
+        border-radius: 20px;
+
+        padding: 27px;
+
+        box-shadow:
+            0 30px 70px rgba(15,23,42,0.25);
+
+        animation: modalUp 0.25s ease;
+    }
+
+    @keyframes modalUp {
+        from {
+            transform: translateY(15px) scale(0.98);
+        }
+
+        to {
+            transform: translateY(0) scale(1);
+        }
+    }
+
+    .modal-header {
+        display: flex;
+
+        align-items: center;
+
+        justify-content: space-between;
+
+        margin-bottom: 24px;
+    }
+
+    .modal-heading {
+        display: flex;
+
+        align-items: center;
+
+        gap: 11px;
+    }
+
+    .modal-icon {
+        width: 40px;
+        height: 40px;
+
+        border-radius: 12px;
+
+        background: #eef2ff;
+
+        display: flex;
+        align-items: center;
+        justify-content: center;
+
+        font-size: 17px;
+    }
+
+    .modal-header h2 {
+        font-size: 18px;
+    }
+
+    .modal-header p {
+        font-size: 10px;
+
+        color: var(--muted);
+
+        margin-top: 3px;
+    }
+
+    .close {
+        width: 33px;
+        height: 33px;
+
+        border-radius: 9px;
+
+        display: flex;
+        align-items: center;
+        justify-content: center;
+
+        cursor: pointer;
+
+        background: #f1f5f9;
+
+        color: #64748b;
+
+        font-size: 20px;
+
+        transition: 0.2s;
+    }
+
+    .close:hover {
+        background: #fee2e2;
+        color: #dc2626;
+    }
+
+    .form-grid {
+        display: grid;
+
+        grid-template-columns:
+            1fr 1fr;
+
+        gap: 16px;
+    }
+
+    .form-group {
+        display: flex;
+
+        flex-direction: column;
+    }
+
+    .form-group.full {
+        grid-column: 1 / -1;
+    }
+
+    .form-group label {
+        font-size: 11px;
+
+        font-weight: 800;
+
+        color: #475569;
+
+        margin-bottom: 7px;
+    }
+
+    .form-group input,
+    .form-group select,
+    .form-group textarea {
+        width: 100%;
+
+        padding: 11px 12px;
+
+        border-radius: 9px;
+
+        border: 1px solid #dbe2ea;
+
+        background: #f8fafc;
+
+        outline: none;
+
+        font-size: 12px;
+
+        color: #1e293b;
+
+        transition: 0.2s;
+    }
+
+    .form-group input:focus,
+    .form-group select:focus,
+    .form-group textarea:focus {
+        background: white;
+
+        border-color: #6366f1;
+
+        box-shadow:
+            0 0 0 3px rgba(99,102,241,0.08);
+    }
+
+    .form-group textarea {
+        resize: vertical;
+        min-height: 85px;
+    }
+
+    .modal-footer {
+        display: flex;
+
+        justify-content: flex-end;
+
+        gap: 8px;
+
+        margin-top: 25px;
+
+        padding-top: 18px;
+
+        border-top: 1px solid #eef2f7;
+    }
+
+
+    /* =========================================================
+       TOAST
+    ========================================================= */
+
+    .toast-container {
+        position: fixed;
+
+        right: 25px;
+        bottom: 25px;
+
+        z-index: 500;
+
+        display: flex;
+
+        flex-direction: column;
+
+        gap: 10px;
+    }
+
+    .toast {
+        min-width: 280px;
+
+        padding: 14px 17px;
+
+        background: white;
+
+        border-radius: 12px;
+
+        box-shadow:
+            0 15px 35px rgba(15,23,42,0.16);
+
+        border-left: 4px solid #4f46e5;
+
+        display: flex;
+
+        align-items: center;
+
+        gap: 10px;
+
+        font-size: 12px;
+
+        animation: toastIn 0.25s ease;
+    }
+
+    .toast.success {
+        border-left-color: #16a34a;
+    }
+
+    .toast.error {
+        border-left-color: #dc2626;
+    }
+
+    @keyframes toastIn {
+        from {
+            transform: translateX(30px);
+            opacity: 0;
+        }
+
+        to {
+            transform: translateX(0);
+            opacity: 1;
+        }
+    }
+
+
+    /* =========================================================
+       EMPTY
+    ========================================================= */
+
+    .empty {
+        text-align: center;
+
+        padding: 45px;
+
+        color: #94a3b8;
+    }
+
+    .empty-icon {
+        font-size: 30px;
+
+        margin-bottom: 8px;
+    }
+
+    .empty-text {
+        font-size: 12px;
+    }
+
+
+    /* =========================================================
+       RESPONSIVE
+    ========================================================= */
+
+    @media(max-width: 1100px) {
+
+        .stats-grid {
+            grid-template-columns:
+                repeat(2, 1fr);
+        }
+
+        .dashboard-grid {
+            grid-template-columns: 1fr;
+        }
+    }
+
+    @media(max-width: 750px) {
+
+        .sidebar {
+            width: 72px;
+            padding: 20px 10px;
+        }
+
+        .brand {
+            justify-content: center;
+            padding-bottom: 25px;
+        }
+
+        .brand-name,
+        .brand-sub,
+        .menu-label,
+        .nav-btn span,
+        .sidebar-bottom {
+            display: none;
+        }
+
+        .brand-icon {
+            width: 42px;
+            height: 42px;
+        }
+
+        .nav-btn {
+            justify-content: center;
+            padding: 10px;
+        }
+
+        .main {
+            margin-left: 72px;
+            padding: 20px;
+        }
+
+        .topbar {
+            align-items: flex-start;
+        }
+
+        .profile-name,
+        .profile-role {
+            display: none;
+        }
+
+        .stats-grid {
+            grid-template-columns: 1fr;
+        }
+
+        .form-grid {
+            grid-template-columns: 1fr;
+        }
+
+        .form-group.full {
+            grid-column: auto;
+        }
+
+        .toolbar {
+            flex-direction: column;
+            align-items: stretch;
+        }
+
+        .search-wrapper {
+            width: 100%;
+        }
+
+        .workflow {
+            flex-direction: column;
+            gap: 18px;
+        }
+
+        .workflow-step:not(:last-child)::after {
+            display: none;
+        }
+    }
+  </style>
+</head>
+
+
+<body>
+
+
+<!-- ============================================================
+     SIDEBAR
+============================================================ -->
+
+<div class="sidebar">
+
+  <div class="brand">
+
+    <div class="brand-icon">
+      💳
+    </div>
+
+    <div>
+      <div class="brand-name">
+        Expense<span>Flow</span>
+      </div>
+
+      <div class="brand-sub">
+        REIMBURSEMENT SYSTEM
+      </div>
+    </div>
+
+  </div>
+
+
+  <div class="menu-label">
+    Workspace
+  </div>
+
+
+  <button class="nav-btn active"
+          onclick="showSection('dashboard', this)">
+
+    <div class="nav-icon">⌂</div>
+
+    <span>Dashboard</span>
+
+  </button>
+
+
+  <button class="nav-btn"
+          onclick="showSection('employees', this)">
+
+    <div class="nav-icon">♙</div>
+
+    <span>Employees</span>
+
+  </button>
+
+
+  <button class="nav-btn"
+          onclick="showSection('claims', this)">
+
+    <div class="nav-icon">▤</div>
+
+    <span>Expense Claims</span>
+
+  </button>
+
+
+  <button class="nav-btn"
+          onclick="showSection('expenses', this)">
+
+    <div class="nav-icon">◈</div>
+
+    <span>Expense Items</span>
+
+  </button>
+
+
+  <button class="nav-btn"
+          onclick="showSection('approvals', this)">
+
+    <div class="nav-icon">✓</div>
+
+    <span>Approval Workflow</span>
+
+  </button>
+
+
+  <div class="menu-label" style="margin-top:28px;">
+    System
+  </div>
+
+
+  <button class="nav-btn">
+
+    <div class="nav-icon">⚙</div>
+
+    <span>Settings</span>
+
+  </button>
+
+
+  <div class="sidebar-bottom">
+
+    <div class="sidebar-bottom-title">
+      SYSTEM STATUS
+    </div>
+
+    <div class="sidebar-bottom-text">
+      ● Backend Connected
+    </div>
+
+  </div>
+
+</div>
+
+
+
+<!-- ============================================================
+     MAIN
+============================================================ -->
+
+<div class="main">
+
+
+  <!-- TOPBAR -->
+
+  <div class="topbar">
+
+    <div class="page-heading">
+
+      <h1 id="pageTitle">
+        Dashboard
+      </h1>
+
+      <p id="pageSubtitle">
+        Employee expense reimbursement management
+      </p>
+
+    </div>
+
+
+    <div class="top-actions">
+
+      <button class="notification">
+        ♧
+      </button>
+
+
+      <div class="profile">
+
+        <div class="profile-avatar">
+          A
+        </div>
+
+        <div>
+
+          <div class="profile-name">
+            Administrator
+          </div>
+
+          <div class="profile-role">
+            System Admin
+          </div>
+
+        </div>
+
+      </div>
+
+    </div>
+
+  </div>
+
+
+
+  <!-- ========================================================
+       DASHBOARD
+  ======================================================== -->
+
+  <div id="dashboard"
+       class="section active">
+
+
+    <div class="stats-grid">
+
+
+      <div class="stat-card">
+
+        <div class="stat-top">
+
+          <div>
+            <div class="stat-label">
+              Total Employees
+            </div>
+          </div>
+
+          <div class="stat-icon">
+            👥
+          </div>
+
+        </div>
+
+        <div class="stat-number"
+             id="employeeCount">
+          0
+        </div>
+
+        <div class="stat-description">
+          Registered employees
+        </div>
+
+      </div>
+
+
+
+      <div class="stat-card">
+
+        <div class="stat-top">
+
+          <div class="stat-label">
+            Total Claims
+          </div>
+
+          <div class="stat-icon">
+            🧾
+          </div>
+
+        </div>
+
+        <div class="stat-number"
+             id="claimCount">
+          0
+        </div>
+
+        <div class="stat-description">
+          Submitted expense claims
+        </div>
+
+      </div>
+
+
+
+      <div class="stat-card">
+
+        <div class="stat-top">
+
+          <div class="stat-label">
+            Expense Items
+          </div>
+
+          <div class="stat-icon">
+            💰
+          </div>
+
+        </div>
+
+        <div class="stat-number"
+             id="expenseCount">
+          0
+        </div>
+
+        <div class="stat-description">
+          Recorded expense items
+        </div>
+
+      </div>
+
+
+
+      <div class="stat-card">
+
+        <div class="stat-top">
+
+          <div class="stat-label">
+            Approval Steps
+          </div>
+
+          <div class="stat-icon">
+            ✓
+          </div>
+
+        </div>
+
+        <div class="stat-number"
+             id="approvalCount">
+          0
+        </div>
+
+        <div class="stat-description">
+          Workflow approvals
+        </div>
+
+      </div>
+
+    </div>
+
+
+
+    <div class="dashboard-grid">
+
+
+      <div class="dashboard-card">
+
+        <div class="dashboard-card-header">
+
+          <h2>
+            Expense Claim Workflow
+          </h2>
+
+          <span>
+                        Process overview
+                    </span>
+
+        </div>
+
+
+        <div class="workflow">
+
+
+          <div class="workflow-step">
+
+            <div class="workflow-icon">
+              👤
+            </div>
+
+            <div class="workflow-title">
+              Employee
+            </div>
+
+            <div class="workflow-desc">
+              Submit claim
+            </div>
+
+          </div>
+
+
+          <div class="workflow-step">
+
+            <div class="workflow-icon">
+              🧾
+            </div>
+
+            <div class="workflow-title">
+              Claim
+            </div>
+
+            <div class="workflow-desc">
+              Add expenses
+            </div>
+
+          </div>
+
+
+          <div class="workflow-step">
+
+            <div class="workflow-icon">
+              🔍
+            </div>
+
+            <div class="workflow-title">
+              Review
+            </div>
+
+            <div class="workflow-desc">
+              Manager review
+            </div>
+
+          </div>
+
+
+          <div class="workflow-step">
+
+            <div class="workflow-icon">
+              ✓
+            </div>
+
+            <div class="workflow-title">
+              Approval
+            </div>
+
+            <div class="workflow-desc">
+              Final decision
+            </div>
+
+          </div>
+
+
+        </div>
+
+      </div>
+
+
+
+      <div class="dashboard-card">
+
+        <div class="dashboard-card-header">
+
+          <h2>
+            System Overview
+          </h2>
+
+        </div>
+
+
+        <div class="info-box">
+
+          <div class="info-box-title">
+            ExpenseFlow Management
+          </div>
+
+          <div class="info-box-text">
+
+            Manage employees, expense claims,
+            individual expense items and approval
+            workflows from a single platform.
+
+          </div>
+
+        </div>
+
+      </div>
+
+    </div>
+
+  </div>
+
+
+
+  <!-- ========================================================
+       EMPLOYEES
+  ======================================================== -->
+
+  <div id="employees"
+       class="section">
+
+
+    <div class="panel">
+
+
+      <div class="panel-header">
+
+        <div class="panel-title">
+
+          <div class="panel-title-icon">
+            👥
+          </div>
+
+          <div>
+
+            <h2>
+              Employee Management
+            </h2>
+
+            <p>
+              Manage employee master data
+            </p>
+
+          </div>
+
+        </div>
+
+
+        <button class="btn btn-primary"
+                onclick="openEmployeeModal()">
+
+          + Add Employee
+
+        </button>
+
+      </div>
+
+
+      <div class="toolbar">
+
+        <div class="search-wrapper">
+
+                    <span class="search-icon">
+                        🔍
+                    </span>
+
+          <input
+                  class="search"
+                  placeholder="Search employees..."
+                  onkeyup="filterTable('employeeTable', this.value)"
+          >
+
+        </div>
+
+      </div>
+
+
+      <div class="table-wrapper">
+
+        <table id="employeeTable">
+
+          <thead>
+
+          <tr>
+
+            <th>ID</th>
+
+            <th>Employee</th>
+
+            <th>Email</th>
+
+            <th>Department</th>
+
+            <th>Role</th>
+
+            <th>Actions</th>
+
+          </tr>
+
+          </thead>
+
+          <tbody></tbody>
+
+        </table>
+
+      </div>
+
+    </div>
+
+  </div>
+
+
+
+  <!-- ========================================================
+       CLAIMS
+  ======================================================== -->
+
+  <div id="claims"
+       class="section">
+
+
+    <div class="panel">
+
+
+      <div class="panel-header">
+
+        <div class="panel-title">
+
+          <div class="panel-title-icon">
+            🧾
+          </div>
+
+          <div>
+
+            <h2>
+              Expense Claims
+            </h2>
+
+            <p>
+              Track employee reimbursement claims
+            </p>
+
+          </div>
+
+        </div>
+
+
+        <button class="btn btn-primary"
+                onclick="openClaimModal()">
+
+          + Add Claim
+
+        </button>
+
+      </div>
+
+
+      <div class="toolbar">
+
+        <div class="search-wrapper">
+
+                    <span class="search-icon">
+                        🔍
+                    </span>
+
+          <input
+                  class="search"
+                  placeholder="Search claims..."
+                  onkeyup="filterTable('claimTable', this.value)"
+          >
+
+        </div>
+
+      </div>
+
+
+      <div class="table-wrapper">
+
+        <table id="claimTable">
+
+          <thead>
+
+          <tr>
+
+            <th>ID</th>
+
+            <th>Employee</th>
+
+            <th>Type</th>
+
+            <th>Amount</th>
+
+            <th>Status</th>
+
+            <th>Description</th>
+
+            <th>Date</th>
+
+            <th>Actions</th>
+
+          </tr>
+
+          </thead>
+
+          <tbody></tbody>
+
+        </table>
+
+      </div>
+
+    </div>
+
+  </div>
+
+
+
+  <!-- ========================================================
+       EXPENSE ITEMS
+  ======================================================== -->
+
+  <div id="expenses"
+       class="section">
+
+
+    <div class="panel">
+
+
+      <div class="panel-header">
+
+        <div class="panel-title">
+
+          <div class="panel-title-icon">
+            💰
+          </div>
+
+          <div>
+
+            <h2>
+              Expense Items
+            </h2>
+
+            <p>
+              Manage individual claim expenses
+            </p>
+
+          </div>
+
+        </div>
+
+
+        <button class="btn btn-primary"
+                onclick="openExpenseModal()">
+
+          + Add Expense
+
+        </button>
+
+      </div>
+
+
+      <div class="toolbar">
+
+        <div class="search-wrapper">
+
+                    <span class="search-icon">
+                        🔍
+                    </span>
+
+          <input
+                  class="search"
+                  placeholder="Search expense items..."
+                  onkeyup="filterTable('expenseTable', this.value)"
+          >
+
+        </div>
+
+      </div>
+
+
+      <div class="table-wrapper">
+
+        <table id="expenseTable">
+
+          <thead>
+
+          <tr>
+
+            <th>ID</th>
+
+            <th>Claim ID</th>
+
+            <th>Category</th>
+
+            <th>Description</th>
+
+            <th>Amount</th>
+
+            <th>Policy Limit</th>
+
+            <th>Limit Check</th>
+
+            <th>Actions</th>
+
+          </tr>
+
+          </thead>
+
+          <tbody></tbody>
+
+        </table>
+
+      </div>
+
+    </div>
+
+  </div>
+
+
+
+  <!-- ========================================================
+       APPROVALS
+  ======================================================== -->
+
+  <div id="approvals"
+       class="section">
+
+
+    <div class="panel">
+
+
+      <div class="panel-header">
+
+        <div class="panel-title">
+
+          <div class="panel-title-icon">
+            ✓
+          </div>
+
+          <div>
+
+            <h2>
+              Approval Workflow
+            </h2>
+
+            <p>
+              Monitor claim approval stages
+            </p>
+
+          </div>
+
+        </div>
+
+
+        <button class="btn btn-primary"
+                onclick="openApprovalModal()">
+
+          + Add Approval
+
+        </button>
+
+      </div>
+
+
+      <div class="toolbar">
+
+        <div class="search-wrapper">
+
+                    <span class="search-icon">
+                        🔍
+                    </span>
+
+          <input
+                  class="search"
+                  placeholder="Search approval steps..."
+                  onkeyup="filterTable('approvalTable', this.value)"
+          >
+
+        </div>
+
+      </div>
+
+
+      <div class="table-wrapper">
+
+        <table id="approvalTable">
+
+          <thead>
+
+          <tr>
+
+            <th>ID</th>
+
+            <th>Claim</th>
+
+            <th>Approver</th>
+
+            <th>Stage</th>
+
+            <th>Status</th>
+
+            <th>Remarks</th>
+
+            <th>Action Date</th>
+
+            <th>Actions</th>
+
+          </tr>
+
+          </thead>
+
+          <tbody></tbody>
+
+        </table>
+
+      </div>
+
+    </div>
+
+  </div>
+
+
+</div>
+
+
+
+<!-- ============================================================
+     MODAL
+============================================================ -->
+
+<div class="modal"
+     id="modal">
+
+
+  <div class="modal-box">
+
+
+    <div class="modal-header">
+
+
+      <div class="modal-heading">
+
+        <div class="modal-icon">
+          ✦
+        </div>
+
+        <div>
+
+          <h2 id="modalTitle">
+            Add
+          </h2>
+
+          <p>
+            Enter the required information below
+          </p>
+
+        </div>
+
+      </div>
+
+
+      <div class="close"
+           onclick="closeModal()">
+
+        ×
+
+      </div>
+
+    </div>
+
+
+    <form id="dynamicForm">
+
+      <div id="formFields"
+           class="form-grid">
+      </div>
+
+
+      <div class="modal-footer">
+
+        <button
+                type="button"
+                class="btn btn-cancel"
+                onclick="closeModal()">
+
+          Cancel
+
+        </button>
+
+
+        <button
+                type="submit"
+                class="btn btn-primary">
+
+          Save Changes
+
+        </button>
+
+      </div>
+
+    </form>
+
+  </div>
+
+</div>
+
+
+
+<!-- ============================================================
+     TOAST
+============================================================ -->
+
+<div class="toast-container"
+     id="toastContainer">
+</div>
+
+
+
+<script>
+
+
+  /* ============================================================
+     API
+  ============================================================ */
+
+  const API = {
+
+      employees: "/api/employees",
+
+      claims: "/api/claims",
+
+      expenses: "/api/expense-items",
+
+      approvals: "/api/approval-steps"
+
+  };
+
+
+  let currentType = "";
+
+  let editingId = null;
+
+
+
+  /* ============================================================
+     NAVIGATION
+  ============================================================ */
+
+  function showSection(section, button) {
+
+
+      document.querySelectorAll(".section")
+          .forEach(s => {
+
+              s.classList.remove("active");
+
+          });
+
+
+      document
+          .getElementById(section)
+          .classList.add("active");
+
+
+      document.querySelectorAll(".nav-btn")
+          .forEach(b => {
+
+              b.classList.remove("active");
+
+          });
+
+
+      if (button) {
+
+          button.classList.add("active");
+
+      }
+
+
+      const titles = {
+
+          dashboard: "Dashboard",
+
+          employees: "Employees",
+
+          claims: "Expense Claims",
+
+          expenses: "Expense Items",
+
+          approvals: "Approval Workflow"
+
+      };
+
+
+      const subtitles = {
+
+          dashboard:
+              "Employee expense reimbursement management",
+
+          employees:
+              "Manage employee master data",
+
+          claims:
+              "Track employee reimbursement claims",
+
+          expenses:
+              "Manage individual claim expenses",
+
+          approvals:
+              "Monitor claim approval stages"
+
+      };
+
+
+      document
+          .getElementById("pageTitle")
+          .innerText = titles[section];
+
+
+      document
+          .getElementById("pageSubtitle")
+          .innerText = subtitles[section];
+
+  }
+
+
+
+  /* ============================================================
+     TOAST
+  ============================================================ */
+
+  function showToast(message, type = "success") {
+
+
+      const container =
+          document.getElementById("toastContainer");
+
+
+      const toast =
+          document.createElement("div");
+
+
+      toast.className =
+          "toast " + type;
+
+
+      toast.innerHTML = `
+
+          <span>
+              ${type === "success" ? "✓" : "!"}
+          </span>
+
+          <span>
+              ${message}
+          </span>
+
+      `;
+
+
+      container.appendChild(toast);
+
+
+      setTimeout(() => {
+
+          toast.remove();
+
+      }, 3000);
+
+  }
+
+
+
+  /* ============================================================
+     MODAL
+  ============================================================ */
+
+  function openModal(title, fields, type, id = null) {
+
+
+      currentType = type;
+
+      editingId = id;
+
+
+      document
+          .getElementById("modalTitle")
+          .innerText =
+          id
+              ? "Edit " + title
+              : "Add " + title;
+
+
+      const container =
+          document.getElementById("formFields");
+
+
+      container.innerHTML = "";
+
+
+      fields.forEach(field => {
+
+
+          const group =
+              document.createElement("div");
+
+
+          group.className =
+              "form-group " +
+              (field.full ? "full" : "");
+
+
+          let input = "";
+
+
+          if (field.type === "select") {
+
+
+              input = `
+
+                  <select
+                      id="${field.name}"
+                      ${field.required ? "required" : ""}
+                  >
+
+                      ${field.options.map(o =>
+
+                          `<option value="${o}">
+                              ${o}
+                          </option>`
+
+                      ).join("")}
+
+                  </select>
+
+              `;
+
+
+          }
+
+          else if (field.type === "textarea") {
+
+
+              input = `
+
+                  <textarea
+                      id="${field.name}"
+                      rows="3"
+                      ${field.required ? "required" : ""}
+                  ></textarea>
+
+              `;
+
+
+          }
+
+          else {
+
+
+              input = `
+
+                  <input
+                      type="${field.type || "text"}"
+                      id="${field.name}"
+                      ${field.required ? "required" : ""}
+                  >
+
+              `;
+
+          }
+
+
+          group.innerHTML = `
+
+              <label>
+                  ${field.label}
+              </label>
+
+              ${input}
+
+          `;
+
+
+          container.appendChild(group);
+
+      });
+
+
+      document
+          .getElementById("modal")
+          .classList.add("show");
+
+  }
+
+
+
+  /* ============================================================
+     CLOSE MODAL
+  ============================================================ */
+
+  function closeModal() {
+
+
+      document
+          .getElementById("modal")
+          .classList.remove("show");
+
+
+      document
+          .getElementById("dynamicForm")
+          .reset();
+
+
+      editingId = null;
+
+  }
+
+
+
+  /* ============================================================
+     EMPLOYEE MODAL
+  ============================================================ */
+
+  function openEmployeeModal(id = null, data = null) {
+
+
+      openModal(
+
+          "Employee",
+
+          [
+
+              {
+                  name: "name",
+                  label: "Employee Name",
+                  required: true
+              },
+
+              {
+                  name: "email",
+                  label: "Email",
+                  type: "email",
+                  required: true
+              },
+
+              {
+                  name: "department",
+                  label: "Department",
+                  required: true
+              },
+
+              {
+                  name: "role",
+                  label: "Role",
+                  required: true
+              }
+
+          ],
+
+          "employees",
+
+          id
+
+      );
+
+
+      if (data) {
+
+          fillForm(data);
+
+      }
+
+  }
+
+
+
+  /* ============================================================
+     CLAIM MODAL
+  ============================================================ */
+
+  function openClaimModal(id = null, data = null) {
+
+
+      openModal(
+
+          "Claim",
+
+          [
+
+              {
+                  name: "employeeId",
+                  label: "Employee ID",
+                  type: "number",
+                  required: true
+              },
+
+              {
+                  name: "claimType",
+                  label: "Claim Type",
+                  required: true
+              },
+
+              {
+                  name: "totalAmount",
+                  label: "Total Amount",
+                  type: "number",
+                  required: true
+              },
+
+              {
+                  name: "status",
+                  label: "Status",
+                  type: "select",
+                  options: [
+                      "PENDING",
+                      "APPROVED",
+                      "REJECTED"
+                  ]
+              },
+
+              {
+                  name: "description",
+                  label: "Description",
+                  type: "textarea",
+                  full: true
+              },
+
+              {
+                  name: "submittedDate",
+                  label: "Submitted Date",
+                  type: "date"
+              }
+
+          ],
+
+          "claims",
+
+          id
+
+      );
+
+
+      if (data) {
+
+          fillForm(data);
+
+      }
+
+  }
+
+
+
+  /* ============================================================
+     EXPENSE MODAL
+  ============================================================ */
+
+  function openExpenseModal(id = null, data = null) {
+
+
+      openModal(
+
+          "Expense Item",
+
+          [
+
+              {
+                  name: "claimId",
+                  label: "Claim ID",
+                  type: "number",
+                  required: true
+              },
+
+              {
+                  name: "category",
+                  label: "Category",
+                  required: true
+              },
+
+              {
+                  name: "description",
+                  label: "Description",
+                  type: "textarea",
+                  full: true
+              },
+
+              {
+                  name: "amount",
+                  label: "Amount",
+                  type: "number",
+                  required: true
+              },
+
+              {
+                  name: "policyLimit",
+                  label: "Policy Limit",
+                  type: "number",
+                  required: true
+              },
+
+              {
+                  name: "exceedsLimit",
+                  label: "Exceeds Limit",
+                  type: "select",
+                  options: [
+                      "false",
+                      "true"
+                  ]
+              }
+
+          ],
+
+          "expenses",
+
+          id
+
+      );
+
+
+      if (data) {
+
+          fillForm(data);
+
+      }
+
+  }
+
+
+
+  /* ============================================================
+     APPROVAL MODAL
+  ============================================================ */
+
+  function openApprovalModal(id = null, data = null) {
+
+
+      openModal(
+
+          "Approval Step",
+
+          [
+
+              {
+                  name: "claimId",
+                  label: "Claim ID",
+                  type: "number",
+                  required: true
+              },
+
+              {
+                  name: "approverId",
+                  label: "Approver ID",
+                  type: "number",
+                  required: true
+              },
+
+              {
+                  name: "stage",
+                  label: "Stage",
+                  type: "select",
+                  options: [
+                      "MANAGER",
+                      "FINANCE"
+                  ]
+              },
+
+              {
+                  name: "status",
+                  label: "Status",
+                  type: "select",
+                  options: [
+                      "PENDING",
+                      "APPROVED",
+                      "REJECTED"
+                  ]
+              },
+
+              {
+                  name: "remarks",
+                  label: "Remarks",
+                  type: "textarea",
+                  full: true
+              },
+
+              {
+                  name: "actionDate",
+                  label: "Action Date",
+                  type: "datetime-local"
+              }
+
+          ],
+
+          "approvals",
+
+          id
+
+      );
+
+
+      if (data) {
+
+          fillForm(data);
+
+      }
+
+  }
+
+
+
+  /* ============================================================
+     FILL FORM
+  ============================================================ */
+
+  function fillForm(data) {
+
+
+      Object.keys(data).forEach(key => {
+
+
+          const element =
+              document.getElementById(key);
+
+
+          if (
+              element &&
+              data[key] !== null &&
+              data[key] !== undefined
+          ) {
+
+
+              let value = data[key];
+
+
+              if (
+                  key === "actionDate" &&
+                  value
+              ) {
+
+                  value =
+                      value.substring(0, 16);
+
+              }
+
+
+              element.value = value;
+
+          }
+
+      });
+
+  }
+
+
+
+  /* ============================================================
+     SAVE
+  ============================================================ */
+
+  document
+      .getElementById("dynamicForm")
+      .addEventListener(
+          "submit",
+          async function(e) {
+
+
+              e.preventDefault();
+
+
+              const data = {};
+
+
+              document
+                  .querySelectorAll(
+                      "#formFields input, #formFields select, #formFields textarea"
+                  )
+                  .forEach(element => {
+
+
+                      let value =
+                          element.value;
+
+
+                      if (
+
+                          element.id ===
+                          "employeeId" ||
+
+                          element.id ===
+                          "claimId" ||
+
+                          element.id ===
+                          "approverId"
+
+                      ) {
+
+                          value = Number(value);
+
+                      }
+
+
+                      if (
+
+                          element.id ===
+                          "totalAmount" ||
+
+                          element.id ===
+                          "amount" ||
+
+                          element.id ===
+                          "policyLimit"
+
+                      ) {
+
+                          value = Number(value);
+
+                      }
+
+
+                      if (
+                          element.id ===
+                          "exceedsLimit"
+                      ) {
+
+                          value =
+                              value === "true";
+
+                      }
+
+
+                      data[element.id] =
+                          value;
+
+                  });
+
+
+              try {
+
+
+                  let url =
+                      API[currentType];
+
+
+                  let method =
+                      "POST";
+
+
+                  if (editingId) {
+
+
+                      url +=
+                          "/" + editingId;
+
+
+                      method =
+                          "PUT";
+
+                  }
+
+
+                  const response =
+                      await fetch(
+                          url,
+                          {
+
+                              method: method,
+
+                              headers: {
+                                  "Content-Type":
+                                      "application/json"
+                              },
+
+                              body:
+                                  JSON.stringify(data)
+
+                          }
+                      );
+
+
+                  if (!response.ok) {
+
+
+                      const errorText =
+                          await response.text();
+
+
+                      showToast(
+                          "Operation failed: " +
+                          errorText,
+                          "error"
+                      );
+
+
+                      return;
+
+                  }
+
+
+                  showToast(
+
+                      editingId
+                          ? "Record updated successfully"
+                          : "Record created successfully"
+
+                  );
+
+
+                  closeModal();
+
+
+                  loadAll();
+
+
+              }
+
+              catch(error) {
+
+
+                  console.error(error);
+
+
+                  showToast(
+                      "Unable to connect to backend",
+                      "error"
+                  );
+
+              }
+
+          }
+      );
+
+
+
+  /* ============================================================
+     LOAD ALL
+  ============================================================ */
+
+  async function loadAll() {
+
+
+      await Promise.all([
+
+          loadEmployees(),
+
+          loadClaims(),
+
+          loadExpenses(),
+
+          loadApprovals()
+
+      ]);
+
+  }
+
+
+
+  /* ============================================================
+     EMPLOYEES
+  ============================================================ */
+
+  async function loadEmployees() {
+
+
+      try {
+
+
+          const response =
+              await fetch(API.employees);
+
+
+          const data =
+              await response.json();
+
+
+          const tbody =
+              document.querySelector(
+                  "#employeeTable tbody"
+              );
+
+
+          tbody.innerHTML = "";
+
+
+          if (data.length === 0) {
+
+              tbody.innerHTML = `
+
+                  <tr>
+
+                      <td colspan="6">
+
+                          <div class="empty">
+
+                              <div class="empty-icon">
+                                  👥
+                              </div>
+
+                              <div class="empty-text">
+                                  No employees found
+                              </div>
+
+                          </div>
+
+                      </td>
+
+                  </tr>
+
+              `;
+
+          }
+
+
+          data.forEach(e => {
+
+
+              tbody.innerHTML += `
+
+                  <tr>
+
+                      <td>
+                          <strong>
+                              #${e.id}
+                          </strong>
+                      </td>
+
+                      <td>
+                          <strong>
+                              ${e.name}
+                          </strong>
+                      </td>
+
+                      <td>
+                          ${e.email}
+                      </td>
+
+                      <td>
+                          ${e.department}
+                      </td>
+
+                      <td>
+                          ${e.role}
+                      </td>
+
+                      <td>
+
+                          <div class="action-group">
+
+                              <button
+                                  class="action-btn btn-edit"
+                                  title="Edit"
+                                  onclick='editEmployee(${JSON.stringify(e)})'
+                              >
+                                  ✎
+                              </button>
+
+                              <button
+                                  class="action-btn btn-danger"
+                                  title="Delete"
+                                  onclick="deleteRecord('employees', ${e.id})"
+                              >
+                                  ×
+                              </button>
+
+                          </div>
+
+                      </td>
+
+                  </tr>
+
+              `;
+
+          });
+
+
+          document
+              .getElementById("employeeCount")
+              .innerText =
+              data.length;
+
+
+      }
+
+      catch(error) {
+
+          console.error(error);
+
+      }
+
+  }
+
+
+
+  function editEmployee(data) {
+
+      openEmployeeModal(
+          data.id,
+          data
+      );
+
+  }
+
+
+
+  /* ============================================================
+     CLAIMS
+  ============================================================ */
+
+  async function loadClaims() {
+
+
+      try {
+
+
+          const response =
+              await fetch(API.claims);
+
+
+          const data =
+              await response.json();
+
+
+          const tbody =
+              document.querySelector(
+                  "#claimTable tbody"
+              );
+
+
+          tbody.innerHTML = "";
+
+
+          if (data.length === 0) {
+
+              tbody.innerHTML = `
+
+                  <tr>
+
+                      <td colspan="8">
+
+                          <div class="empty">
+
+                              <div class="empty-icon">
+                                  🧾
+                              </div>
+
+                              <div class="empty-text">
+                                  No expense claims found
+                              </div>
+
+                          </div>
+
+                      </td>
+
+                  </tr>
+
+              `;
+
+          }
+
+
+          data.forEach(c => {
+
+
+              tbody.innerHTML += `
+
+                  <tr>
+
+                      <td>
+                          <strong>
+                              #${c.id}
+                          </strong>
+                      </td>
+
+                      <td>
+                          #${c.employeeId}
+                      </td>
+
+                      <td>
+                          ${c.claimType}
+                      </td>
+
+                      <td>
+                          <strong>
+                              ₹ ${c.totalAmount}
+                          </strong>
+                      </td>
+
+                      <td>
+
+                          <span
+                              class="badge ${getStatusClass(c.status)}"
+                          >
+                              ${c.status}
+                          </span>
+
+                      </td>
+
+                      <td>
+                          ${c.description || "-"}
+                      </td>
+
+                      <td>
+                          ${c.submittedDate || "-"}
+                      </td>
+
+                      <td>
+
+                          <div class="action-group">
+
+                              <button
+                                  class="action-btn btn-edit"
+                                  title="Edit"
+                                  onclick='editClaim(${JSON.stringify(c)})'
+                              >
+                                  ✎
+                              </button>
+
+                              <button
+                                  class="action-btn btn-danger"
+                                  title="Delete"
+                                  onclick="deleteRecord('claims', ${c.id})"
+                              >
+                                  ×
+                              </button>
+
+                          </div>
+
+                      </td>
+
+                  </tr>
+
+              `;
+
+          });
+
+
+          document
+              .getElementById("claimCount")
+              .innerText =
+              data.length;
+
+
+      }
+
+      catch(error) {
+
+          console.error(error);
+
+      }
+
+  }
+
+
+
+  function editClaim(data) {
+
+      openClaimModal(
+          data.id,
+          data
+      );
+
+  }
+
+
+
+  /* ============================================================
+     EXPENSES
+  ============================================================ */
+
+  async function loadExpenses() {
+
+
+      try {
+
+
+          const response =
+              await fetch(API.expenses);
+
+
+          const data =
+              await response.json();
+
+
+          const tbody =
+              document.querySelector(
+                  "#expenseTable tbody"
+              );
+
+
+          tbody.innerHTML = "";
+
+
+          if (data.length === 0) {
+
+              tbody.innerHTML = `
+
+                  <tr>
+
+                      <td colspan="8">
+
+                          <div class="empty">
+
+                              <div class="empty-icon">
+                                  💰
+                              </div>
+
+                              <div class="empty-text">
+                                  No expense items found
+                              </div>
+
+                          </div>
+
+                      </td>
+
+                  </tr>
+
+              `;
+
+          }
+
+
+          data.forEach(e => {
+
+
+              tbody.innerHTML += `
+
+                  <tr>
+
+                      <td>
+                          <strong>
+                              #${e.id}
+                          </strong>
+                      </td>
+
+                      <td>
+                          #${e.claimId}
+                      </td>
+
+                      <td>
+                          ${e.category}
+                      </td>
+
+                      <td>
+                          ${e.description || "-"}
+                      </td>
+
+                      <td>
+                          <strong>
+                              ₹ ${e.amount}
+                          </strong>
+                      </td>
+
+                      <td>
+                          ₹ ${e.policyLimit}
+                      </td>
+
+                      <td>
+
+                          <span
+                              class="badge ${
+                                  e.exceedsLimit
+                                  ? "rejected"
+                                  : "approved"
+                              }"
+                          >
+
+                              ${
+                                  e.exceedsLimit
+                                  ? "EXCEEDED"
+                                  : "WITHIN LIMIT"
+                              }
+
+                          </span>
+
+                      </td>
+
+                      <td>
+
+                          <div class="action-group">
+
+                              <button
+                                  class="action-btn btn-edit"
+                                  title="Edit"
+                                  onclick='editExpense(${JSON.stringify(e)})'
+                              >
+                                  ✎
+                              </button>
+
+                              <button
+                                  class="action-btn btn-danger"
+                                  title="Delete"
+                                  onclick="deleteRecord('expenses', ${e.id})"
+                              >
+                                  ×
+                              </button>
+
+                          </div>
+
+                      </td>
+
+                  </tr>
+
+              `;
+
+          });
+
+
+          document
+              .getElementById("expenseCount")
+              .innerText =
+              data.length;
+
+
+      }
+
+      catch(error) {
+
+          console.error(error);
+
+      }
+
+  }
+
+
+
+  function editExpense(data) {
+
+      openExpenseModal(
+          data.id,
+          data
+      );
+
+  }
+
+
+
+  /* ============================================================
+     APPROVALS
+  ============================================================ */
+
+  async function loadApprovals() {
+
+
+      try {
+
+
+          const response =
+              await fetch(API.approvals);
+
+
+          const data =
+              await response.json();
+
+
+          const tbody =
+              document.querySelector(
+                  "#approvalTable tbody"
+              );
+
+
+          tbody.innerHTML = "";
+
+
+          if (data.length === 0) {
+
+              tbody.innerHTML = `
+
+                  <tr>
+
+                      <td colspan="8">
+
+                          <div class="empty">
+
+                              <div class="empty-icon">
+                                  ✓
+                              </div>
+
+                              <div class="empty-text">
+                                  No approval steps found
+                              </div>
+
+                          </div>
+
+                      </td>
+
+                  </tr>
+
+              `;
+
+          }
+
+
+          data.forEach(a => {
+
+
+              tbody.innerHTML += `
+
+                  <tr>
+
+                      <td>
+                          <strong>
+                              #${a.id}
+                          </strong>
+                      </td>
+
+                      <td>
+                          #${a.claimId}
+                      </td>
+
+                      <td>
+                          #${a.approverId}
+                      </td>
+
+                      <td>
+                          ${a.stage}
+                      </td>
+
+                      <td>
+
+                          <span
+                              class="badge ${getStatusClass(a.status)}"
+                          >
+                              ${a.status}
+                          </span>
+
+                      </td>
+
+                      <td>
+                          ${a.remarks || "-"}
+                      </td>
+
+                      <td>
+                          ${a.actionDate || "-"}
+                      </td>
+
+                      <td>
+
+                          <div class="action-group">
+
+                              <button
+                                  class="action-btn btn-edit"
+                                  title="Edit"
+                                  onclick='editApproval(${JSON.stringify(a)})'
+                              >
+                                  ✎
+                              </button>
+
+                              <button
+                                  class="action-btn btn-danger"
+                                  title="Delete"
+                                  onclick="deleteRecord('approvals', ${a.id})"
+                              >
+                                  ×
+                              </button>
+
+                          </div>
+
+                      </td>
+
+                  </tr>
+
+              `;
+
+          });
+
+
+          document
+              .getElementById("approvalCount")
+              .innerText =
+              data.length;
+
+
+      }
+
+      catch(error) {
+
+          console.error(error);
+
+      }
+
+  }
+
+
+
+  function editApproval(data) {
+
+      openApprovalModal(
+          data.id,
+          data
+      );
+
+  }
+
+
+
+  /* ============================================================
+     DELETE
+  ============================================================ */
+
+  async function deleteRecord(type, id) {
+
+
+      const confirmed =
+          confirm(
+              "Delete this record?\n\nThis action cannot be undone."
+          );
+
+
+      if (!confirmed) {
+
+          return;
+
+      }
+
+
+      try {
+
+
+          const response =
+              await fetch(
+                  API[type] + "/" + id,
+                  {
+                      method: "DELETE"
+                  }
+              );
+
+
+          if (!response.ok) {
+
+              showToast(
+                  "Delete operation failed",
+                  "error"
+              );
+
+              return;
+
+          }
+
+
+          showToast(
+              "Record deleted successfully"
+          );
+
+
+          loadAll();
+
+
+      }
+
+      catch(error) {
+
+
+          console.error(error);
+
+
+          showToast(
+              "Unable to connect to backend",
+              "error"
+          );
+
+      }
+
+  }
+
+
+
+  /* ============================================================
+     STATUS
+  ============================================================ */
+
+  function getStatusClass(status) {
+
+
+      if (!status) {
+
+          return "pending";
+
+      }
+
+
+      status =
+          status.toUpperCase();
+
+
+      if (
+          status === "APPROVED"
+      ) {
+
+          return "approved";
+
+      }
+
+
+      if (
+          status === "REJECTED"
+      ) {
+
+          return "rejected";
+
+      }
+
+
+      return "pending";
+
+  }
+
+
+
+  /* ============================================================
+     SEARCH
+  ============================================================ */
+
+  function filterTable(
+      tableId,
+      searchValue
+  ) {
+
+
+      const table =
+          document.getElementById(tableId);
+
+
+      const rows =
+          table.querySelectorAll(
+              "tbody tr"
+          );
+
+
+      searchValue =
+          searchValue.toLowerCase();
+
+
+      rows.forEach(row => {
+
+
+          row.style.display =
+
+              row.innerText
+                  .toLowerCase()
+                  .includes(searchValue)
+
+                  ? ""
+
+                  : "none";
+
+      });
+
+  }
+
+
+
+  /* ============================================================
+     CLOSE MODAL WHEN CLICKING OUTSIDE
+  ============================================================ */
+
+  document
+      .getElementById("modal")
+      .addEventListener(
+          "click",
+          function(e) {
+
+              if (
+                  e.target === this
+              ) {
+
+                  closeModal();
+
+              }
+
+          }
+      );
+
+
+
+  /* ============================================================
+     INITIAL LOAD
+  ============================================================ */
+
+  loadAll();
+
+
+</script>
+
+</body>
+</html>
